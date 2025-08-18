@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запуск трансляции</title>
+    <link rel="stylesheet" href="../../css/Steam.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .screen-container {
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="screen-container">
+        <h2 id="waitTitle">Запуск трансляции</h2>
+        <div class="loading"></div>
+        <div class="info-text" id="waitMessage">Пожалуйста подождите ...</div>
+        <div class="progress-bar">
+            <div class="progress" id="progressBar"></div>
+        </div>
+        
+        <footer>
+            © 2025 Steam Control System | Все права защищены
+        </footer>
+    </div>
+
+    <script src="../../js/steam.js"></script>
+</body>
+</html>
