@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление ПК</title>
+    <link rel="stylesheet" href="../css/Steam.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+        }
+        
+        .screen-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .action-btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.4rem;
+        }
+        
+        .action-btn.restart {
+            background: linear-gradient(to right, #00cc66, #00aa55);
+        }
+        
+        .action-btn.shutdown {
+            background: linear-gradient(to right, #ff5500, #ff3300);
+        }
+    </style>
+</head>
+<body>
+    <div class="screen-container">
+        <h2>Управление компьютерами</h2>
+        
+        <div class="action-buttons">
+            <button class="action-btn restart" onclick="selectPCs('restart')">Перезагрузить ПК</button>
+            <button class="action-btn shutdown" onclick="selectPCs('shutdown')">Выключить ПК</button>
+        </div>
+        
+        <button class="btn btn-secondary" onclick="window.location.href='../index.html'">В главное меню</button>
+        
+        <footer>
+            © 2025 Системное меню | Все права защищены
+        </footer>
+    </div>
+
+    <script>
+        function selectPCs(action) {
+            // Сохраняем выбранное действие в localStorage
+            localStorage.setItem('pcAction', action);
+            // Переходим к выбору ПК
+            window.location.href = 'select-pc.html?action=' + action;
+        }
+    </script>
+</body>
+</html>
