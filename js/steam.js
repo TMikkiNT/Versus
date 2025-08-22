@@ -389,3 +389,37 @@ function initErrorScreen() {
         }
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('action');
+        
+        if (action) {
+            // Изменяем заголовок в зависимости от действия
+            const header = document.querySelector('.header h2');
+            if (header) {
+                if (action === 'restart') {
+                    header.textContent = 'Выберите ПК для перезагрузки:';
+                } else if (action === 'shutdown') {
+                    header.textContent = 'Выберите ПК для выключения:';
+                }
+            }
+        }
+        
+        // Обработка подтверждения выбора
+        const confirmBtn = document.getElementById('confirmActionBtn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', function() {
+                const selectedPCs = JSON.parse(localStorage.getItem('selectedPCs') || '[]');
+                const action = localStorage.getItem('pcAction');
+                
+                if (selectedPCs.length === 0) {
+                    alert('Выберите хотя бы один ПК!');
+                    return;
+                }
+                
+                // Переходим на страницу ожидания
+                window.location.href = 'wait.html?action=' + action;
+            });
+        }
+    });
