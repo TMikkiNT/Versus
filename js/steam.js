@@ -1,3 +1,24 @@
+const WS_SERVER = 'ws://192.168.1.120:8080';
+
+function sendSteamCommand(pcNumbers, command) {
+    pcNumbers.forEach(pcNum => {
+        try {
+            const socket = new WebSocket(WS_SERVER);
+            
+            socket.onopen = function() {
+                socket.send(JSON.stringify({
+                    targetPc: pcNum,
+                    command: command,
+                    from: 'website'
+                }));
+                socket.close();
+            };
+        } catch (error) {
+            console.error('Ошибка отправки команды:', error);
+        }
+    });
+}
+
 // Общий обработчик для всех страниц Steam
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
@@ -270,6 +291,34 @@ function initWaitScreen() {
 function finishAction(action, actionInfo) {
     console.log(`Finishing action: ${action}`);
     const isSuccess = Math.random() > 0.3; // 70% успеха
+
+  // Получаем выбранные ПК
+    const selectedPCs = JSON.parse(localStorage.getItem('selectedPCs') || '[]');
+    
+    // Для каждой команды - свой набор действий
+    selectedPCs.forEach(pcNumber => {
+        let command;
+        
+        switch(action) {
+        case 'launch':
+            const game = JSON.parse(localStorage.getItem('selectedGame'));
+            command = `start steam://rungameid/${game.id}`;
+            break;
+        case 'stop':
+            command = 'taskkill /f /im vrserver.exe';
+            break;
+        case 'shutdown':
+            command = 'shutdown /s /f /t 0';
+            break;
+        case 'restart':
+            command = 'shutdown /r /f /t 0';
+            break;
+    }
+        
+        if (command) {
+            sendCommand(selectedPCs, command);
+        }
+    });
     
     if (isSuccess) {
         console.log('Action succeeded');
