@@ -121,7 +121,7 @@ function initSelectPCScreen() {
 
     // Кнопка назад
     document.getElementById('backBtn').addEventListener('click', function() {
-        window.location.href = '../index.html';
+        window.location.href = '../../index.html';
     });
 }
 
@@ -142,7 +142,7 @@ function initWaitScreen() {
 
     if (!actionConfig) {
         alert('Неизвестное действие!');
-        window.location.href = '../index.html';
+        window.location.href = '../../index.html';
         return;
     }
 
@@ -201,7 +201,7 @@ function finishAction(selectedPCs, action) {
             if (seconds <= 0) {
                 clearInterval(countdownInterval);
                 localStorage.removeItem('selectedPCs');
-                window.location.href = '../index.html';
+                window.location.href = '../../index.html';
             }
         }, 1000);
     } else {
@@ -231,6 +231,6 @@ function initErrorScreen() {
 
     document.getElementById('backToMainBtn').addEventListener('click', function() {
         localStorage.removeItem('selectedPCs');
-        window.location.href = '../index.html';
+        window.location.href = '../../index.html';
     });
 }
