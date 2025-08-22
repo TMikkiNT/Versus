@@ -40,7 +40,7 @@ function initSelectPCScreen() {
     const state = {
         selectedPCs: [],
         pcIPs: {
-            1: '192.168.1.111',
+            1: '192.168.1.120',
             2: '192.168.1.112',
             3: '192.168.1.113',
             4: '192.168.1.114'
@@ -183,7 +183,7 @@ function sendCommandToPCs(pcNumbers, command) {
 
 function getPCIP(pcNum) {
     const ips = {
-        1: '192.168.1.111',
+        1: '192.168.1.120',
         2: '192.168.1.112',
         3: '192.168.1.113',
         4: '192.168.1.114'
