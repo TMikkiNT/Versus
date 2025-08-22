@@ -253,18 +253,18 @@ function initWaitScreen() {
             success: 'Игра успешно остановлена!',
             error: 'Не удалось остановить игру! Проверьте состояние ПК и запустите ВНОВЬ'
         },
-        shutdown: {
-            title: 'Выключение SteamVR',
-            message: 'Выключение SteamVR... Пожалуйста подождите',
-            success: 'SteamVR успешно выключен!',
-            error: 'Не удалось выключить SteamVR! Проверьте состояние ПК и запустите ВНОВЬ'
-        },
         restart: {
-            title: 'Перезапуск Steam',
-            message: 'Перезапуск Steam... Пожалуйста подождите',
-            success: 'Steam успешно перезапущен!',
-            error: 'Не удалось перезапустить Steam! Проверьте состояние ПК и запустите ВНОВЬ'
-        }
+        title: 'Перезагрузка ПК',
+        message: 'Перезагрузка компьютеров... Пожалуйста подождите',
+        success: 'ПК успешно перезагружены!',
+        error: 'Не удалось перезагрузить ПК! Проверьте состояние ПК и запустите ВНОВЬ'
+    },
+    shutdown: {
+        title: 'Выключение ПК',
+        message: 'Выключение компьютеров... Пожалуйста подождите',
+        success: 'ПК успешно выключены!',
+        error: 'Не удалось выключить ПК! Проверьте состояние ПК и запустите ВНОВЬ'
+    }
     };
     
     const urlParams = new URLSearchParams(window.location.search);
@@ -389,37 +389,3 @@ function initErrorScreen() {
         }
     });
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const action = urlParams.get('action');
-        
-        if (action) {
-            // Изменяем заголовок в зависимости от действия
-            const header = document.querySelector('.header h2');
-            if (header) {
-                if (action === 'restart') {
-                    header.textContent = 'Выберите ПК для перезагрузки:';
-                } else if (action === 'shutdown') {
-                    header.textContent = 'Выберите ПК для выключения:';
-                }
-            }
-        }
-        
-        // Обработка подтверждения выбора
-        const confirmBtn = document.getElementById('confirmActionBtn');
-        if (confirmBtn) {
-            confirmBtn.addEventListener('click', function() {
-                const selectedPCs = JSON.parse(localStorage.getItem('selectedPCs') || '[]');
-                const action = localStorage.getItem('pcAction');
-                
-                if (selectedPCs.length === 0) {
-                    alert('Выберите хотя бы один ПК!');
-                    return;
-                }
-                
-                // Переходим на страницу ожидания
-                window.location.href = 'wait.html?action=' + action;
-            });
-        }
-    });
