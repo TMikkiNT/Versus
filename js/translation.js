@@ -1,5 +1,16 @@
 const WS_SERVER = 'ws://192.168.1.120:8080';
 
+// Объект с действиями и их настройками
+const actions = {
+    translation: {
+        title: 'Запуск трансляции',
+        message: 'Запуск трансляции... Пожалуйста подождите',
+        success: 'Трансляция успешно запущена!',
+        error: 'Не удалось запустить трансляцию! Проверьте Wireless adb в шлеме и запустите ВНОВЬ',
+        command: 'start_streaming'
+    }
+};
+
 function sendCommandToPCs(pcNumbers, command) {
     pcNumbers.forEach(pcNum => {
         try {
@@ -23,7 +34,6 @@ function sendCommandToPCs(pcNumbers, command) {
     });
 }
 
-
 document.addEventListener('DOMContentLoaded', function() {
     // Определение текущего экрана
     if (document.querySelector('.pc-selection')) {
@@ -46,6 +56,16 @@ function initSelectPCScreen() {
             4: '192.168.1.114'
         }
     };
+
+    // Получаем действие из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    const actionConfig = actions[action];
+    
+    // Устанавливаем заголовок в соответствии с действием
+    if (actionConfig && document.getElementById('actionTitle')) {
+        document.getElementById('actionTitle').textContent = actionConfig.title;
+    }
 
     // Восстановление выбранных ПК
     const savedPCs = localStorage.getItem('selectedPCs');
@@ -79,12 +99,22 @@ function initSelectPCScreen() {
             alert('Выберите хотя бы один ПК!');
             return;
         }
-        window.location.href = 'wait.html';
+        
+        // Получаем действие из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('action');
+        
+        if (!action) {
+            alert('Не указано действие!');
+            return;
+        }
+        
+        window.location.href = `wait.html?action=${action}`;
     });
 
     // Кнопка назад
     document.getElementById('backBtn').addEventListener('click', function() {
-        window.location.href = '../index.html';
+        window.location.href = '../../index.html';
     });
 }
 
@@ -93,15 +123,30 @@ function initWaitScreen() {
     // Восстановление выбранных ПК
     const savedPCs = localStorage.getItem('selectedPCs');
     if (!savedPCs || JSON.parse(savedPCs).length === 0) {
-        window.location.href = 'select-pc.html';
+        window.location.href = '../index.html';
         return;
     }
     const selectedPCs = JSON.parse(savedPCs);
+
+    // Получаем действие из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    const actionConfig = actions[action];
+
+    if (!actionConfig) {
+        alert('Неизвестное действие!');
+        window.location.href = '../../index.html';
+        return;
+    }
 
     // Элементы интерфейса
     const progressBar = document.getElementById('progressBar');
     const waitTitle = document.getElementById('waitTitle');
     const waitMessage = document.getElementById('waitMessage');
+
+    // Устанавливаем заголовки в соответствии с действием
+    waitTitle.textContent = actionConfig.title;
+    waitMessage.textContent = actionConfig.message;
 
     // Имитация прогресса
     let progress = 0;
@@ -111,25 +156,29 @@ function initWaitScreen() {
         
         if (progress >= 100) {
             clearInterval(interval);
-            finishTranslation(selectedPCs);
+            finishAction(selectedPCs, action);
         }
     }, 60);
 }
 
-// Завершение трансляции
-function finishTranslation(selectedPCs) {
+// Завершение действия
+function finishAction(selectedPCs, action) {
+    const actionConfig = actions[action];
     const isSuccess = Math.random() > 0.2; // 80% успеха
     
     if (isSuccess) {
         // Отправка команды на ПК
-        sendCommandToPCs(selectedPCs, 'start_streaming');
+        sendCommandToPCs(selectedPCs, actionConfig.command);
         
         // Успешное завершение
         document.querySelector('.loading').style.display = 'none';
         document.querySelector('.progress-bar').style.display = 'none';
         
+        const waitTitle = document.getElementById('waitTitle');
+        const waitMessage = document.getElementById('waitMessage');
+        
         waitTitle.textContent = 'Успешно!';
-        waitMessage.textContent = `Трансляция запущена на ПК: ${selectedPCs.join(', ')}`;
+        waitMessage.textContent = actionConfig.success;
         
         // Отсчет до возврата
         let seconds = 3;
@@ -145,48 +194,36 @@ function finishTranslation(selectedPCs) {
             if (seconds <= 0) {
                 clearInterval(countdownInterval);
                 localStorage.removeItem('selectedPCs');
-                window.location.href = '../index.html';
+                window.location.href = '../../index.html';
             }
         }, 1000);
     } else {
         // Ошибка
         setTimeout(() => {
-            window.location.href = 'error.html';
+            window.location.href = `error.html?action=${action}`;
         }, 500);
     }
 }
 
 // ===== ЭКРАН ОШИБКИ =====
 function initErrorScreen() {
+    // Получаем действие из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    const actionConfig = actions[action];
+
+    // Устанавливаем сообщение об ошибке
+    const errorMessage = document.getElementById('errorMessage');
+    if (errorMessage && actionConfig) {
+        errorMessage.textContent = actionConfig.error;
+    }
+    
     document.getElementById('retryBtn').addEventListener('click', function() {
-        window.location.href = 'select-pc.html';
+        window.location.href = `select-pc.html?action=${action}`;
     });
 
     document.getElementById('backToMainBtn').addEventListener('click', function() {
         localStorage.removeItem('selectedPCs');
-        window.location.href = '../index.html';
+        window.location.href = '../../index.html';
     });
-}
-
-// ===== ОТПРАВКА КОМАНД НА ПК =====
-function sendCommandToPCs(pcNumbers, command) {
-    pcNumbers.forEach(pcNum => {
-        const ip = getPCIP(pcNum);
-        console.log(`Отправка команды "${command}" на ПК ${pcNum} (${ip})`);
-        
-        // Реализация отправки команды:
-        // 1. WebSocket: const socket = new WebSocket(`ws://${ip}:8080`);
-        // 2. HTTP: fetch(`http://${ip}/command`, { method: 'POST', body: command })
-        // 3. ADB: adb -s ${ip} shell ${command}
-    });
-}
-
-function getPCIP(pcNum) {
-    const ips = {
-        1: '192.168.1.120',
-        2: '192.168.1.112',
-        3: '192.168.1.113',
-        4: '192.168.1.114'
-    };
-    return ips[pcNum] || '';
 }
